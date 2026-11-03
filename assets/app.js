@@ -263,12 +263,16 @@ function openReport(r){
 }
 function closeReport(){$("#modal").hidden=true;$("#mPages").innerHTML="";document.body.style.overflow="";if(lastFocus)lastFocus.focus()}
 
-var CONTACT_TO="bubble.youthimpact@gmail.com";
+/* Contact form delivery. After activating FormSubmit, replace FORM_KEY with the random string FormSubmit
+   emails you (it hides the inbox address completely). The address shown to visitors is CONTACT_SHOWN. */
+var CONTACT_SHOWN="seoulmate.official@gmail.com";
+var FORM_KEY="bb280b58d2ffca3210d3e1d1b940b6df";
 function contactPage(){
   return '<section class="cream grow" style="padding-bottom:120px"><div class="wrap"><div class="page-h" style="padding-bottom:30px"><h1 style="margin-bottom:46px">Get in <span class="o">touch.</span></h1><p style="font-size:15px">Questions, partnerships, or just want to say hello — we’d love to hear from you.</p></div>'+
    '<form class="formcard" id="cForm" novalidate><div class="f2"><div class="fld"><label for="cName">Name</label><input class="in" id="cName" autocomplete="name"></div><div class="fld"><label for="cEmail">Email</label><input class="in" id="cEmail" type="email" autocomplete="email"></div></div>'+
    '<div class="fld"><label for="cSub">Subject</label><input class="in" id="cSub"></div><div class="fld"><label for="cMsg">Message</label><textarea class="in" id="cMsg"></textarea></div>'+
-   '<button class="submit" id="cSend">Send message</button><div class="err" id="cErr"></div><div id="cOut"></div></form></div></section>';
+   '<button class="submit" id="cSend">Send message</button><div class="err" id="cErr"></div><div id="cOut"></div></form>'+
+   '<p class="cmail">Prefer email? Write to <b>'+CONTACT_SHOWN+'</b></p></div></section>';
 }
 function bindContact(){
   $("#cForm").addEventListener("submit",async function(e){
@@ -279,7 +283,7 @@ function bindContact(){
     $("#cErr").textContent="";
     var btn=$("#cSend");btn.disabled=true;btn.textContent="Sending…";
     try{
-      var r=await fetch("https://formsubmit.co/ajax/"+CONTACT_TO,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+      var r=await fetch("https://formsubmit.co/ajax/"+FORM_KEY,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
         body:JSON.stringify({name:n,email:m,_replyto:m,_subject:"SEOULMATE contact: "+(s||"New message"),subject:s,message:t,_template:"table",_captcha:"false"})});
       var j=await r.json();
       if(!r.ok||String(j.success)!=="true")throw new Error("send_failed");
@@ -287,7 +291,7 @@ function bindContact(){
       $("#cOut").innerHTML='<div class="note ok"><b>Message sent.</b> Thanks, '+esc(n)+'. We’ll reply to '+esc(m)+' soon.</div>';
     }catch(err){
       var full="From: "+n+" <"+m+">\nSubject: "+(s||"Hello SEOULMATE")+"\n\n"+t;
-      $("#cOut").innerHTML='<div class="note">Your message couldn’t be sent from here. Copy it and email <b>'+CONTACT_TO+'</b>.<div style="margin-top:10px"><button type="button" class="btn line" id="cCopy" style="font-size:13px;padding:6px 14px">Copy message</button></div></div>';
+      $("#cOut").innerHTML='<div class="note">Your message couldn’t be sent from here. Copy it and email <b>'+CONTACT_SHOWN+'</b>.<div style="margin-top:10px"><button type="button" class="btn line" id="cCopy" style="font-size:13px;padding:6px 14px">Copy message</button></div></div>';
       $("#cCopy").onclick=function(){var b=this;(navigator.clipboard?navigator.clipboard.writeText(full):Promise.reject()).then(function(){b.textContent="Copied"},function(){b.textContent="Select the message above and copy it"})};
     }
     btn.disabled=false;btn.textContent="Send message";
@@ -479,9 +483,11 @@ function route(){
   var r=ROUTES[h];$("#app").innerHTML=r[0]();fixLinks($("#app"));if(r[1])r[1]();
   document.title=TITLES[h]||TITLES[""];
   [].forEach.call(document.querySelectorAll("#nav a"),function(a){a.classList.toggle("on",a.getAttribute("href")===hrefFor(h)&&h!=="")});
-  $("#mnav").classList.remove("open");$("#menuBtn").setAttribute("aria-expanded","false");
+  if($("#mnav").classList.contains("open"))setMenu(false);
+  [].forEach.call(document.querySelectorAll("#mnav .l"),function(a){a.classList.toggle("on",a.getAttribute("href")===hrefFor(h)&&h!=="")});
   window.scrollTo(0,0);
 }
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest(".tile");if(t){RS.cat=t.dataset.cat;RS.q="";RS.rain=false;RS.shown=24}},true);
 if(PATH_MODE){
   window.addEventListener("popstate",route);
   document.addEventListener("click",function(e){
@@ -494,16 +500,22 @@ if(PATH_MODE){
   });
 }else window.addEventListener("hashchange",route);
 document.addEventListener("click",function(e){
-  var t=e.target.closest(".tile");if(t){RS.cat=t.dataset.cat;RS.q="";RS.rain=false;RS.shown=24}
+  var t=e.target.closest(".tile");
   var h=e.target.closest("[data-fav]");if(h){var on=toggleFav(h.dataset.fav);if(me()){h.classList.toggle("on",on);toast(on?"Added to your itinerary":"Removed from your itinerary")}}
   var c=e.target.closest("[data-rep]");if(c)openReport(REPORTS[+c.dataset.rep]);
   if(e.target.closest('a[href="#recommend"]')&&!t&&!e.target.closest(".tile")){/* keep filters */}
 });
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape"&&!$("#modal").hidden)closeReport();
+  if(e.key==="Escape"&&$("#mnav").classList.contains("open")){setMenu(false);$("#menuBtn").focus()}
   var c=e.target.closest&&e.target.closest("[data-rep]");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openReport(REPORTS[+c.dataset.rep])}
 });
 $("#mClose").onclick=closeReport;
 $("#modal").addEventListener("click",function(e){if(e.target===this)closeReport()});
-$("#menuBtn").onclick=function(){var o=$("#mnav").classList.toggle("open");this.setAttribute("aria-expanded",o)};
+function setMenu(o){var m=$("#mnav");m.classList.toggle("open",o);m.setAttribute("aria-hidden",!o);$("#mscrim").hidden=!o;document.body.classList.toggle("menu-open",o);$("#menuBtn").setAttribute("aria-expanded",o);if(o)$("#mClose2").focus()}
+$("#menuBtn").onclick=function(){setMenu(true)};
+$("#mClose2").onclick=function(){setMenu(false);$("#menuBtn").focus()};
+$("#mscrim").onclick=function(){setMenu(false)};
+$("#mnav").addEventListener("click",function(e){if(e.target.closest("a"))setMenu(false)});
+window.addEventListener("resize",function(){if(window.innerWidth>820&&$("#mnav").classList.contains("open"))setMenu(false)});
 renderAuth();fixLinks(document);route();
