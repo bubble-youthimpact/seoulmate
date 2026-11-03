@@ -96,7 +96,7 @@ function seedDemo(){
 seedDemo();
 /* keep the header in sync with Firebase's real login state */
 /* Profiles and saved places live in Firestore at users/{uid} when Firebase is on; this browser keeps a cached copy. */
-var FIELDS=["name","email","start","gender","phone","favs","photo"];
+var FIELDS=["name","email","start","gender","phone","favs","photo","route"];
 function db(){return fb()&&firebase.firestore?firebase.firestore():null}
 function persist(u){
   u=u||me();save("users",users);
@@ -393,7 +393,13 @@ function bindProfile(){
 }
 async function logout(){await AUTH.signOut();toast("Logged out");go("")}
 
-var lastRoute=null;
+function savedRouteHtml(u,list){
+  var r=u.route;if(!r||!r.text)return "";
+  var when="";try{when=new Date(r.at).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}catch(e){}
+  var stale=r.key!==routeKey(list,u);
+  return (stale?'<p class="note" style="margin:0 0 16px">Your saved places or starting location changed since this route was made. Click <b>Find best route</b> to update it.</p>':'')+
+    fmtRoute(r.text)+(when?'<p class="hint" style="text-align:center;margin:4px 0 0">Saved '+esc(when)+'</p>':'');
+}
 function savedPlaces(){return favs().map(function(n){for(var i=0;i<DATA.rec.length;i++)if(DATA.rec[i].n===n)return DATA.rec[i];return null}).filter(Boolean)}
 function itinPage(){
   var u=me(),list=savedPlaces();
@@ -405,7 +411,7 @@ function itinPage(){
     '<div class="ihead"><h2>Saved places'+(list.length?' ('+list.length+')':'')+'</h2>'+(list.length?'<a href="#recommend">+ Add more</a>':'')+'</div>'+cards+
     '<button class="findbtn" id="findBtn"'+(ready?'':' disabled')+'>'+I.bus+'<span>Find best route</span></button>'+
     (!u.start&&list.length?'<p class="err">Add your starting location in Profile to plan a route.</p>':'')+
-    '<div class="route" id="route">'+(lastRoute&&lastRoute.key===routeKey(list,u)?lastRoute.html:'')+'</div></div>');
+    '<div class="route" id="route">'+savedRouteHtml(u,list)+'</div></div>');
 }
 function routeKey(list,u){return list.map(function(r){return r.n}).join("|")+"@"+u.start}
 function fmtRoute(txt){
@@ -439,8 +445,8 @@ function bindItin(){
     var user="name: "+list.map(function(r){return r.n}).join(", ")+" address: "+list.map(function(r){return r.a}).join(", ")+" starting: "+u.start;
     try{
       var txt=await askRoute(user,{name:list.map(function(r){return r.n}).join(", "),address:list.map(function(r){return r.a}).join(", "),starting:u.start});
-      var html=fmtRoute(txt);lastRoute={key:routeKey(list,u),html:html};
-      var box=$("#route");if(box)box.innerHTML=html;
+      u.route={text:txt,key:routeKey(list,u),at:new Date().toISOString()};persist(u);
+      var box=$("#route");if(box)box.innerHTML=savedRouteHtml(u,list);
     }catch(err){
       var box2=$("#route");
       if(box2)box2.innerHTML='<p class="err">'+(err&&err.code==="no_worker"?"The route finder isn’t connected yet. Add your Worker URL to ROUTE_WORKER_URL.":err&&err.code==="not_granted"?"Route finding needs permission. Allow it from the page’s Permissions menu, then try again.":err&&err.code==="rate_limited"?"Too many route requests right now. Wait a minute and try again.":"Couldn’t find a route. Try again in a moment.")+'</p>';
