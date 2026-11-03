@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="/" data-spa>
+<title>Profile · SEOULMATE</title>
+<meta name="description" content="Your SEOULMATE profile.">
+<link rel="canonical" href="https://seoulmate.travel/profile">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ED9C2B">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SEOULMATE">
+<meta property="og:title" content="Profile · SEOULMATE">
+<meta property="og:description" content="Your SEOULMATE profile.">
+<meta property="og:url" content="https://seoulmate.travel/profile">
+<meta property="og:image" content="https://seoulmate.travel/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SEOULMATE home page: Plan Korea like a local, in minutes.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Profile · SEOULMATE">
+<meta name="twitter:description" content="Your SEOULMATE profile.">
+<meta name="twitter:image" content="https://seoulmate.travel/og-image.jpg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="hdr">
+  <div class="wrap">
+    <a class="logo" href="#">SEOULMATE</a>
+    <nav class="nav" id="nav">
+      <a href="#about">About</a><a href="#recommend">Recommend</a><a href="#resources">Resources</a><a href="#reports">Reports</a><a href="#contact">Contact</a>
+    </nav>
+    <div class="auth" id="auth"></div>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><svg class="ion" width="22" height="22" viewBox="0 0 512 512" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 160h352M80 256h352M80 352h352"/></svg></button>
+  </div>
+</header>
+<div class="mnav" id="mnav"><div class="wrap">
+  <a class="l" href="#about">About</a><a class="l" href="#recommend">Recommend</a><a class="l" href="#resources">Resources</a><a class="l" href="#reports">Reports</a><a class="l" href="#contact">Contact</a>
+  <div class="auth" id="auth2"></div>
+</div></div>
+
+<main id="app"></main>
+
+<footer class="foot" id="foot">
+  <div class="wrap">
+    <div><span class="logo">SEOULMATE</span><small>© SEOULMATE. All Rights Reserved.</small></div>
+    <div><h4>Quick Links</h4><ul><li><a href="#">Home</a></li><li><a href="#about">About</a></li><li><a href="#recommend">Recommend</a></li><li><a href="#resources">Resources</a></li><li><a href="#contact">Contact</a></li><li><a href="privacy">Privacy Policy</a></li><li><a href="terms">Terms of Service</a></li></ul></div>
+    <div><h4>Connect</h4><ul>
+      <li><svg class="ion" width="16" height="16" viewBox="0 0 512 512" aria-hidden="true"><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg><a href="mailto:seoulmate.official@gmail.com">seoulmate.official@gmail.com</a></li>
+      <li><svg class="ion" width="16" height="16" viewBox="0 0 512 512" aria-hidden="true"><path d="M350.54 148.68l-26.62-42.06C318.31 100.08 310.62 96 302 96h-92c-8.62 0-16.31 4.08-21.92 10.62l-26.62 42.06C155.85 155.23 148.62 160 140 160H80a32 32 0 00-32 32v192a32 32 0 0032 32h352a32 32 0 0032-32V192a32 32 0 00-32-32h-59c-8.65 0-16.85-4.77-22.46-11.32z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><circle cx="256" cy="272" r="80" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M124 158v-22h-24v22"/></svg><a href="https://www.instagram.com/seoul_mateofficial/" target="_blank" rel="noopener">@seoul_mateofficial</a></li>
+    </ul></div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="box">
+    <div class="bar"><h3 id="mTitle">Report</h3>
+      <div class="acts"><a class="btn line hide-sm" id="mOpen" target="_blank" rel="noopener">Open in new tab</a><a class="btn fill" id="mDl" target="_blank" rel="noopener">Download</a><button class="x" id="mClose" aria-label="Close">&times;</button></div>
+    </div>
+    <div class="pages" id="mPages"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
